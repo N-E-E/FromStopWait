@@ -21,7 +21,8 @@ public:
 
     void make_packet(Packet& packet, const Message& message, int seqnum);
     bool no_corrupt(const Packet& packet);
-    void resend_group();
+    bool check_next_seqnum_in_window(int next_seqnum, int base);
+    bool check_num_in_loop_range(int num, int lb, int ub, int t);
 public:
     GBNRdtSender();
     GBNRdtSender(int k, int N);

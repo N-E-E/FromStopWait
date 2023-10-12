@@ -6,7 +6,7 @@
 
 
 int main(int argc, char* argv[]) {
-    // srand(345);  // for debug
+    // srand(348);  // for debug
 
     RdtSender *ps = new GBNRdtSender();
 	RdtReceiver * pr = new GBNRdtReceiver();

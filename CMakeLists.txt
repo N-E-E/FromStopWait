@@ -6,7 +6,6 @@ set(CMAKE_CXX FLAGS -fexec-charset=GBK)
 add_definitions(-std=c++11)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
-# aux_source_directory(${PROJECT_SOURCE_DIR}/src SRC_LIST)
 
 set(STOPWAIT_SRC_LIST 
     src/StopWait.cpp 
@@ -18,11 +17,19 @@ set(GBN_SRC_LIST
     src/GBNRdtReceiver.cpp 
     src/GBNRdtSender.cpp)
 
+set(SR_SRC_LIST 
+    src/SR.cpp 
+    src/SRRdtReceiver.cpp 
+    src/SRRdtSender.cpp)
+
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 add_executable(stop_wait ${STOPWAIT_SRC_LIST})
 add_executable(gbn ${GBN_SRC_LIST})
+add_executable(sr ${SR_SRC_LIST})
 
 FIND_LIBRARY(NETSIM_LIB libnetsim.a ${PROJECT_SOURCE_DIR}/lib)
+
 TARGET_LINK_LIBRARIES(stop_wait  ${NETSIM_LIB})
 TARGET_LINK_LIBRARIES(gbn  ${NETSIM_LIB})
+TARGET_LINK_LIBRARIES(sr  ${NETSIM_LIB})
