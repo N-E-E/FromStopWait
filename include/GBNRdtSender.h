@@ -8,12 +8,12 @@
 #include <vector>
 
 class GBNRdtSender : public RdtSender {
-private:
+protected:
     int _base;
     int _next_seqnum;
     int _N, _k, _max_seqnum;
     bool _waiting_state;
-    std::vector<std::shared_ptr<Packet>> _packet_waiting_ack;  // TODO: change the member to smart ptr
+    std::vector<std::shared_ptr<Packet>> _packet_waiting_ack;
 
 public:
     bool getWaitingState() { return _waiting_state; }
@@ -21,10 +21,6 @@ public:
 	void receive(const Packet &ackPkt);  // 接受确认Ack，将被NetworkServiceSimulator调用	
 	void timeoutHandler(int seqNum);  // Timeout handler，将被NetworkServiceSimulator调用
 
-    void make_packet(Packet& packet, const Message& message, int seqnum);
-    bool no_corrupt(const Packet& packet);
-    bool check_next_seqnum_in_window(int next_seqnum, int base);
-    bool check_num_in_loop_range(int num, int lb, int ub, int t);
 public:
     GBNRdtSender();
     GBNRdtSender(int k, int N);

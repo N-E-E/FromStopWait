@@ -11,13 +11,7 @@ public:
 
     void receive(const Packet& packet);
 
-    void make_packet(const Packet& rcv_packet);
-
-    bool no_corrupt(const Packet& packet);
-
-    Message extract(const Packet& packet);
-
-private:
+protected:
     int _expected_seqnum;
     int _k, _max_seqnum;
     std::shared_ptr<Packet> _last_ack_packet;

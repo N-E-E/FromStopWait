@@ -96,7 +96,7 @@ void GBNRdtSender::receive(const Packet& ackPacket) {
         pns->startTimer(SENDER, Configuration::TIME_OUT, _base);
         
     } else {  // ackPacket.acknum < _base
-        // do nothing.
+        // do nothing and waiting for resend.
     }
 }
 

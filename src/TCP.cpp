@@ -1,21 +1,18 @@
 #include "Global.h"
 #include "Config.h"
 #include "Helpers.h"
-#include "RdtSender.h"
-#include "RdtReceiver.h"
-#include "GBNRdtSender.h"
-#include "GBNRdtReceiver.h"
-
+#include "TCPSender.h"
+#include "TCPReceiver.h"
 
 int main(int argc, char* argv[]) {
 #ifdef DEBUG_NO_RANDOM
     srand(347);
 #endif
 
-	Helpers::init(WINDOW_SIZE, MAX_SEQNUM);
+    Helpers::init(WINDOW_SIZE, MAX_SEQNUM);
 
-    RdtSender *ps = new GBNRdtSender();
-	RdtReceiver * pr = new GBNRdtReceiver();
+    RdtSender *ps = new TCPSender();
+	RdtReceiver * pr = new TCPReceiver();
 	pns->setRunMode(0);  //VERBOS模式
 //	pns->setRunMode(1);  //安静模式
 	pns->init();

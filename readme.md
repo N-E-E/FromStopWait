@@ -19,7 +19,7 @@ make
 Run:
 ```bash
 cd bin
-./stop_wait or ./gbn or ./sr
+./stop_wait or ./gbn or ./sr or ./tcp
 ```
 
 ### notes
