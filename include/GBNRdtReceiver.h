@@ -2,6 +2,7 @@
 #define GBN_RDT_RECEIVER_H
 
 #include "RdtReceiver.h"
+#include <memory>
 
 class GBNRdtReceiver : public RdtReceiver {
 public:
@@ -19,7 +20,7 @@ public:
 private:
     int _expected_seqnum;
     int _k, _max_seqnum;
-    Packet _last_ack_packet;
+    std::shared_ptr<Packet> _last_ack_packet;
 };
 
 

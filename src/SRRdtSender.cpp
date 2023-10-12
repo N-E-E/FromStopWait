@@ -2,8 +2,10 @@
 #include "RandomEventEnum.h"
 #include "DataStructure.h"
 #include "Global.h"
+#include "Helpers.h"
+#include "Config.h"
 
-SRRdtSender::SRRdtSender() : _k(3), _max_seqnum(pow(2, _k)), _N(4),
+SRRdtSender::SRRdtSender() : _k(SEQNUM_BIT), _max_seqnum(MAX_SEQNUM), _N(WINDOW_SIZE),
                             _send_base(0), _next_seqnum(0), _waiting_state(false) 
 {
     _packet_waiting_ack.resize(_max_seqnum);
@@ -13,41 +15,46 @@ SRRdtSender::SRRdtSender() : _k(3), _max_seqnum(pow(2, _k)), _N(4),
 SRRdtSender::~SRRdtSender(){}
 
 bool SRRdtSender::send(const Message& message) {
-    if (message.data[0] == 'F') {
-        std::cout << "here" << std::endl;
+#ifdef DEBUG_STOP_IN_MSG
+    if (Helpers::stop_in_message(message, 'F')) {
+        int a = 1;
     }
+#endif
     if (_waiting_state) {
+        // window is full, refuse data
+        std::cout << "packet is blocking..." << std::endl;
         return false;
     }
-    if (check_next_seqnum_in_window(_next_seqnum, _send_base)) {
+    if (Helpers::check_in_window(_next_seqnum, _send_base)) {
         // send packet and start timer
-        make_packet(_packet_waiting_ack[_next_seqnum], message, _next_seqnum);
-        pUtils->printPacket("发送方发送报文", _packet_waiting_ack[_next_seqnum]);
-        pns->sendToNetworkLayer(RECEIVER, _packet_waiting_ack[_next_seqnum]);
+        _packet_waiting_ack[_next_seqnum] = Helpers::make_msg_packet(message, _next_seqnum);
+        pUtils->printPacket("发送方发送报文", *_packet_waiting_ack[_next_seqnum]);
+        pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[_next_seqnum]);
         pns->startTimer(SENDER, Configuration::TIME_OUT, _next_seqnum);
 
         // update info
         _ack_state[_next_seqnum] = false;
         _next_seqnum = (_next_seqnum + 1) % _max_seqnum;
-        if (check_next_seqnum_in_window(_next_seqnum, _send_base)) {  // NOTES: must update here! if go down, 
-                                                                                            //A packet will be lost under the test frame!
+        if (Helpers::check_in_window(_next_seqnum, _send_base)) {  // NOTES: must update here! if go down, 
+                                                                                // A packet will be lost under the test frame!
             _waiting_state = false;
         } else {
             _waiting_state = true;
         }
         return true;
     }
-    // window is full, refuse data
-    _waiting_state = true;
-    std::cout << "packet is blocking..." << std::endl;
+    // abnormal case
+    throw "An error occur in SRRdtSender::send";
     return false;
 }
 
 void SRRdtSender::receive(const Packet &ackPacket) {
-    _waiting_state = false;  //NOTES: must add one here. or the test frame will be stuck
-                            //(if receive don't change the state, then send will be stuck)
+    _waiting_state = false;  // NOTES: must add one here. or the test frame will be stuck
+                            // (if receive don't change the state, then send will be stuck and receive forever)
     // assert(ackPkt.acknum < _next_seqnum);
-    if (check_acknum_in_range(ackPacket.acknum) && no_corrupt(ackPacket)) {  // actually is else.
+    if (Helpers::no_corrupt(ackPacket) && 
+        Helpers::check_in_range(ackPacket.acknum, _send_base, _next_seqnum)) {
+        
         pUtils->printPacket("发送方正确收到确认", ackPacket);
         pns->stopTimer(SENDER, ackPacket.acknum);
         _ack_state[ackPacket.acknum] = true;
@@ -65,45 +72,9 @@ void SRRdtSender::receive(const Packet &ackPacket) {
 
 void SRRdtSender::timeoutHandler(int seqNum) {
     std::string hint = "发送方定时器时间到，重发上次发送的报文-" + std::to_string(seqNum);
-    pUtils->printPacket(hint.c_str(), _packet_waiting_ack[seqNum]);
-    pns->sendToNetworkLayer(RECEIVER, _packet_waiting_ack[seqNum]);
+    pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[seqNum]);
+    pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[seqNum]);
     // restart timer
     pns->stopTimer(SENDER, seqNum);
 	pns->startTimer(SENDER, Configuration::TIME_OUT, seqNum);
-}
-
-
-void SRRdtSender::make_packet(Packet& packet, const Message& message, int seqnum) {
-    packet.acknum = -1;  // unused
-    packet.seqnum = seqnum;
-    memcpy(packet.payload, message.data, sizeof(message.data));
-    packet.checksum = pUtils->calculateCheckSum(packet);
-}
-
-bool SRRdtSender::check_next_seqnum_in_window(int next_seqnum, int send_base) {
-    if (next_seqnum < send_base) {
-        return next_seqnum < (send_base + _N) % _max_seqnum;
-    } else {
-        return next_seqnum < send_base + _N;
-    }
-}
-
-bool SRRdtSender::check_acknum_in_range(int acknum) {
-    if (_send_base <= _next_seqnum) {
-        return acknum >= _send_base && acknum < _next_seqnum;
-    } else {
-        if (acknum >= _send_base) return acknum < _next_seqnum + _max_seqnum;
-        else return acknum < _next_seqnum;
-    }
-    return false;
-}
-
-// bool SRRdtSender::check_acknum_valid(int acknum) {
-//     if (acknum > _next_seqnum) {
-//         return 
-//     }
-// }
-
-bool SRRdtSender::no_corrupt(const Packet& packet) {
-    return packet.checksum == pUtils->calculateCheckSum(packet);
 }

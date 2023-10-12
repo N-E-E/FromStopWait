@@ -21,7 +21,8 @@ set(GBN_SRC_LIST
 set(SR_SRC_LIST 
     src/SR.cpp 
     src/SRRdtReceiver.cpp 
-    src/SRRdtSender.cpp)
+    src/SRRdtSender.cpp
+    src/Helpers.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

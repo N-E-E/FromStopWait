@@ -1,8 +1,10 @@
 #ifndef GBN_RDT_SENDER_H
 #define GBN_RDT_SENDER_H
 
+#include "DataStructure.h"
 #include "RdtSender.h"
 
+#include <memory>
 #include <vector>
 
 class GBNRdtSender : public RdtSender {
@@ -11,7 +13,7 @@ private:
     int _next_seqnum;
     int _N, _k, _max_seqnum;
     bool _waiting_state;
-    std::vector<Packet> _packet_waiting_ack;  // TODO: change the member to smart ptr
+    std::vector<std::shared_ptr<Packet>> _packet_waiting_ack;  // TODO: change the member to smart ptr
 
 public:
     bool getWaitingState() { return _waiting_state; }

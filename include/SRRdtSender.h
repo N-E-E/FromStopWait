@@ -3,6 +3,7 @@
 
 #include "RdtSender.h"
 
+#include <memory>
 #include <vector>
 #include <cmath>
 
@@ -13,14 +14,6 @@ public:
 	void receive(const Packet &ackPkt);  // 接受确认Ack，将被NetworkServiceSimulator调用	
 	void timeoutHandler(int seqNum);  // Timeout handler，将被NetworkServiceSimulator调用
 
-    void make_packet(Packet& packet, const Message& message, int seqnum);
-
-    bool check_next_seqnum_in_window(int next_seqnum, int send_base);
-
-    bool check_acknum_in_range(int acknum);
-
-    bool no_corrupt(const Packet& packet);
-
     SRRdtSender();
     ~SRRdtSender();
 
@@ -29,7 +22,7 @@ private:
     int _N;
     int _send_base, _next_seqnum;
     bool _waiting_state;
-    std::vector<Packet> _packet_waiting_ack;  // TODO: change it to smart ptr
+    std::vector<std::shared_ptr<Packet>> _packet_waiting_ack;  // TODO: change it to smart ptr
     std::vector<bool> _ack_state;
 };
 

@@ -8,7 +8,9 @@
 
 
 int main(int argc, char* argv[]) {
-    // srand(348);  // for debug
+#ifdef DEBUG_NO_RANDOM
+    // srand(348);
+#endif
 
 	Helpers::init(WINDOW_SIZE, MAX_SEQNUM);
 
