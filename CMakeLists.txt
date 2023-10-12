@@ -15,7 +15,8 @@ set(STOPWAIT_SRC_LIST
 set(GBN_SRC_LIST 
     src/GBN.cpp 
     src/GBNRdtReceiver.cpp 
-    src/GBNRdtSender.cpp)
+    src/GBNRdtSender.cpp
+    src/Helpers.cpp)
 
 set(SR_SRC_LIST 
     src/SR.cpp 

@@ -1,11 +1,15 @@
 #include "DataStructure.h"
 #include "Global.h"
+#include "Helpers.h"
+#include "Config.h"
 #include "GBNRdtSender.h"
 #include "RandomEventEnum.h"
 
+#include <cmath>
+
 
 GBNRdtSender::GBNRdtSender() : _base(0), _next_seqnum(0), _waiting_state(false), 
-                                _k(3), _N(4), _max_seqnum(pow(2, _k)) 
+                                _k(SEQNUM_BIT), _N(4), _max_seqnum(MAX_SEQNUM) 
 {
     _packet_waiting_ack.resize(_max_seqnum);
 }
@@ -24,7 +28,7 @@ bool GBNRdtSender::send(const Message &message) {
         return false;
     }
 
-    if (check_next_seqnum_in_window(_next_seqnum, _base)) {
+    if (Helpers::check_in_window(_next_seqnum, _base)) {
         // send packet and start timer
         make_packet(_packet_waiting_ack[_next_seqnum], message, _next_seqnum);
         // for debug
@@ -44,8 +48,8 @@ bool GBNRdtSender::send(const Message &message) {
 
         // update info
         _next_seqnum = (_next_seqnum + 1) % _max_seqnum;
-        if (check_next_seqnum_in_window(_next_seqnum, _base)) {  // NOTES: must update here! if go down, 
-                                                                                            //A packet will be lost under the test frame!
+        if (Helpers::check_in_window(_next_seqnum, _base)) {  // NOTES: must update here! if go down, 
+                                                                                 //A packet will be lost under the test frame!
             _waiting_state = false;
         } else {
             _waiting_state = true;
@@ -67,7 +71,7 @@ void GBNRdtSender::receive(const Packet& ackPacket) {
     _waiting_state = false;         //NOTES: must add one here. or the test frame will be stuck
                                     //(if receive don't change the state, then send will be stuck)
     if (no_corrupt(ackPacket) && 
-        check_num_in_loop_range(ackPacket.acknum, _base, (_base + _N) % _max_seqnum, _max_seqnum)) {  // TODO: here?
+        Helpers::check_in_range(ackPacket.acknum, _base, (_base + _N) % _max_seqnum)) {  // TODO: here?
         
         pUtils->printPacket("发送方正确收到确认", ackPacket);
         // this->_waiting_state = false;
@@ -126,20 +130,20 @@ bool GBNRdtSender::no_corrupt(const Packet& packet) {
     return packet.checksum == pUtils->calculateCheckSum(packet);
 }
 
-bool GBNRdtSender::check_next_seqnum_in_window(int next_seqnum, int base) {
-    if (next_seqnum < base) {
-        return next_seqnum < (base + _N) % _max_seqnum;
-    } else {
-        return next_seqnum < base + _N;
-    }
-}
+// bool GBNRdtSender::check_next_seqnum_in_window(int next_seqnum, int base) {
+//     if (next_seqnum < base) {
+//         return next_seqnum < (base + _N) % _max_seqnum;
+//     } else {
+//         return next_seqnum < base + _N;
+//     }
+// }
 
-bool GBNRdtSender::check_num_in_loop_range(int num, int lb, int ub, int t) {
-    if (lb <= ub) {
-        return num >= lb && num < ub;
-    } else {
-        if (num >= lb) return num < ub + t;
-        else return num < ub;
-    }
-    return false;
-}
+// bool GBNRdtSender::check_num_in_loop_range(int num, int lb, int ub, int t) {
+//     if (lb <= ub) {
+//         return num >= lb && num < ub;
+//     } else {
+//         if (num >= lb) return num < ub + t;
+//         else return num < ub;
+//     }
+//     return false;
+// }

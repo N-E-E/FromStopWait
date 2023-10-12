@@ -2,8 +2,8 @@
 #define GBN_RDT_SENDER_H
 
 #include "RdtSender.h"
+
 #include <vector>
-#include <cmath>
 
 class GBNRdtSender : public RdtSender {
 private:

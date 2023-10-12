@@ -1,4 +1,6 @@
 #include "Global.h"
+#include "Config.h"
+#include "Helpers.h"
 #include "RdtSender.h"
 #include "RdtReceiver.h"
 #include "GBNRdtSender.h"
@@ -7,6 +9,8 @@
 
 int main(int argc, char* argv[]) {
     // srand(348);  // for debug
+
+	Helpers::init(WINDOW_SIZE, MAX_SEQNUM);
 
     RdtSender *ps = new GBNRdtSender();
 	RdtReceiver * pr = new GBNRdtReceiver();
