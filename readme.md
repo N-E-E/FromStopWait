@@ -18,6 +18,10 @@ make
 ```
 Run:
 ```bash
+sh run.sh
+```
+here is `run.sh`:
+```bash
 # ./bin/stopwait_test \
 # > ./log/stopwait_log.txt
 
