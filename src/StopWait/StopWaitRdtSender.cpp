@@ -1,6 +1,6 @@
 
 #include "Global.h"
-#include "StopWaitRdtSender.h"
+#include "StopWait/StopWaitRdtSender.h"
 
 
 StopWaitRdtSender::StopWaitRdtSender():expectSequenceNumberSend(0),waitingState(false)

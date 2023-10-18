@@ -1,6 +1,6 @@
 
 #include "Global.h"
-#include "StopWaitRdtReceiver.h"
+#include "StopWait/StopWaitRdtReceiver.h"
 
 
 StopWaitRdtReceiver::StopWaitRdtReceiver() : expectSequenceNumberRcvd(0)

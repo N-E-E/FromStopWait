@@ -2,7 +2,7 @@
 #include "Config.h"
 #include "Helpers.h"
 #include "RandomEventEnum.h"
-#include "SRRdtReceiver.h"
+#include "SR/SRRdtReceiver.h"
 
 #include <cmath>
 #include <memory>

@@ -1,6 +1,6 @@
 #include "Config.h"
 #include "Global.h"
-#include "GBNRdtReceiver.h"
+#include "GBN/GBNRdtReceiver.h"
 #include "Helpers.h"
 #include "RandomEventEnum.h"
 

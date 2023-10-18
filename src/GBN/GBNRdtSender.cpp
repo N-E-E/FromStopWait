@@ -2,7 +2,7 @@
 #include "Global.h"
 #include "Helpers.h"
 #include "Config.h"
-#include "GBNRdtSender.h"
+#include "GBN/GBNRdtSender.h"
 #include "RandomEventEnum.h"
 
 #include <cmath>

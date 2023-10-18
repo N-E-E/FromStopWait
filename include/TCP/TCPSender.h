@@ -1,7 +1,7 @@
 #ifndef TCP_SENDER_H
 #define TCP_SENDER_H
 
-#include "GBNRdtSender.h"
+#include "GBN/GBNRdtSender.h"
 
 class TCPSender : public GBNRdtSender {
 public:

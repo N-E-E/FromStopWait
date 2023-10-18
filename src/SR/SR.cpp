@@ -3,18 +3,15 @@
 #include "Helpers.h"
 #include "RdtSender.h"
 #include "RdtReceiver.h"
-#include "GBNRdtSender.h"
-#include "GBNRdtReceiver.h"
+#include "SR/SRRdtReceiver.h"
+#include "SR/SRRdtSender.h"
 
-#include <cassert>
-#include <string>
 #include <unistd.h>
 #include <getopt.h>
 
-
 int main(int argc, char* argv[]) {
 #ifdef DEBUG_NO_RANDOM
-    srand(347);
+    srand(348);
 #endif
 	// option related vars
 	std::string input_file = "./input.txt";
@@ -53,12 +50,13 @@ int main(int argc, char* argv[]) {
 	logger->common_info("input file: " + input_file);
 	logger->common_info("output file: " + output_file);
 	logger->common_info("run mode: " + std::to_string(run_mode));
-	// assert(0);
+
 
 	Helpers::init(WINDOW_SIZE, MAX_SEQNUM);
 
-    RdtSender *ps = new GBNRdtSender();
-	RdtReceiver * pr = new GBNRdtReceiver();
+    RdtSender *ps = new SRRdtSender();
+	RdtReceiver * pr = new SRRdtReceiver();
+
 	pns->setRunMode(run_mode);  //VERBOS模式
 //	pns->setRunMode(1);  //安静模式
 	pns->init();
@@ -74,6 +72,6 @@ int main(int argc, char* argv[]) {
 	delete pr;
 	delete pUtils;									//指向唯一的工具类实例，只在main函数结束前delete
 	delete pns;										//指向唯一的模拟网络环境类实例，只在main函数结束前delete
-	
-	return 0;
+
+    return 0;
 }

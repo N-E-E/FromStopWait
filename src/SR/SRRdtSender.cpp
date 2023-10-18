@@ -1,9 +1,10 @@
-#include "SRRdtSender.h"
+#include "SR/SRRdtSender.h"
 #include "RandomEventEnum.h"
 #include "DataStructure.h"
 #include "Global.h"
 #include "Helpers.h"
 #include "Config.h"
+
 #include <string>
 
 SRRdtSender::SRRdtSender() : _k(SEQNUM_BIT), _max_seqnum(MAX_SEQNUM), _N(WINDOW_SIZE),

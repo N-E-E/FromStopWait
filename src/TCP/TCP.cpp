@@ -1,8 +1,8 @@
 #include "Global.h"
 #include "Config.h"
 #include "Helpers.h"
-#include "TCPSender.h"
-#include "TCPReceiver.h"
+#include "TCP/TCPSender.h"
+#include "TCP/TCPReceiver.h"
 
 #include <unistd.h>
 #include <getopt.h>
