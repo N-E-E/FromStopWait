@@ -21,6 +21,9 @@ SRRdtReceiver::SRRdtReceiver() : _k(SEQNUM_BIT), _max_seqnum(MAX_SEQNUM), _N(WIN
 		_last_ack_packet->payload[i] = '.';
 	}
     _last_ack_packet->checksum = pUtils->calculateCheckSum(*_last_ack_packet);
+
+    logger->print_window(_rcv_base, (_rcv_base + _N) % _max_seqnum, "recv-window");
+    logger->print_state(_rcv_state, _rcv_base, (_rcv_base + _N) % _max_seqnum);
 }
 
 SRRdtReceiver::~SRRdtReceiver() {}
@@ -44,6 +47,8 @@ void SRRdtReceiver::receive(const Packet& packet) {
                 logger->common_info("deliver packet " + std::to_string(_rcv_base));
                 pns->delivertoAppLayer(RECEIVER, Helpers::extract(*_rcv_packet[_rcv_base]));
                 // update info
+                logger->print_window(_rcv_base, (_rcv_base + _N) % _max_seqnum, "recv-window");
+                logger->print_state(_rcv_state, _rcv_base, (_rcv_base + _N) % _max_seqnum);
                 _rcv_state[_rcv_base] = false;
                 _rcv_base = (_rcv_base + 1) % _max_seqnum;
             }
@@ -52,9 +57,15 @@ void SRRdtReceiver::receive(const Packet& packet) {
             _last_ack_packet = Helpers::make_ack_packet(packet);
             logger->print_packet("接收到已确认区间的数据，接收方重新发送发送确认报文", *_last_ack_packet);
             pns->sendToNetworkLayer(SENDER, *_last_ack_packet);
+
+            logger->print_window(_rcv_base, (_rcv_base + _N) % _max_seqnum, "recv-window");
+            logger->print_state(_rcv_state, _rcv_base, (_rcv_base + _N) % _max_seqnum);
         } 
     } else {
         logger->print_packet("接收方没有正确收到发送方的报文,数据校验错误", packet);
+
+        logger->print_window(_rcv_base, (_rcv_base + _N) % _max_seqnum, "recv-window");
+        logger->print_state(_rcv_state, _rcv_base, (_rcv_base + _N) % _max_seqnum);
         // do nothing and just wait for the timer to restart?
         return;
     }

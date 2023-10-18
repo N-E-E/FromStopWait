@@ -29,6 +29,16 @@ namespace Helpers {
         std::cout << "[" + hint + "] " << window << std::endl;
     }
 
+    void Logger::print_state(const std::vector<bool>& state, int start, int end) {
+        std::string window = "[ ";
+        assert(max_seqnum_ != 0);  // make sure % is valid
+        for (auto i = start; i != end; i = (i + 1) % max_seqnum_) {
+            window += std::to_string(state[i]) + " ";
+        }
+        window += "]";
+        std::cout << "[recv-state]  " << window << std::endl;
+    }
+
     bool check_in_range(int target, int lb, int ub) {
         if (lb <= ub) {
             return target >= lb && target < ub;

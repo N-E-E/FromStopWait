@@ -4,6 +4,7 @@
 #include "DataStructure.h"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace Helpers {
 
@@ -14,6 +15,8 @@ namespace Helpers {
         void common_info(std::string info);
 
         void print_window(int start, int end, std::string hint = "slide-window");
+
+        void print_state(const std::vector<bool>& state, int start, int end);
     };
 
     bool check_in_window(int target, int base);
