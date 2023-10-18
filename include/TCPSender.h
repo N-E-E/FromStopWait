@@ -1,3 +1,6 @@
+#ifndef TCP_SENDER_H
+#define TCP_SENDER_H
+
 #include "GBNRdtSender.h"
 
 class TCPSender : public GBNRdtSender {
@@ -12,3 +15,5 @@ private:
     int _dup_ack_count;
 
 };
+
+#endif

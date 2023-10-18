@@ -1,11 +1,33 @@
 #include "Helpers.h"
+#include "Config.h"
 #include "DataStructure.h"
 #include "Global.h"
 
+#include <cassert>
 #include <cstring>
+
+std::shared_ptr<Helpers::Logger> logger;  // global logger
 
 namespace Helpers {
     int window_size_ = 0, max_seqnum_ = 0;
+
+    void Logger::print_packet(std::string description, const Packet& packet) {
+        pUtils->printPacket(description.c_str(), packet);
+    }
+
+    void Logger::common_info(std::string info) {
+        std::cout << "[common info] " << info << std::endl;
+    }
+
+    void Logger::print_window(int start, int end, std::string hint) {
+        std::string window = "[ ";
+        assert(max_seqnum_ != 0);  // make sure % is valid
+        for (auto i = start; i != end; i = (i + 1) % max_seqnum_) {
+            window += std::to_string(i) + " ";
+        }
+        window += "]";
+        std::cout << "[" + hint + "] " << window << std::endl;
+    }
 
     bool check_in_range(int target, int lb, int ub) {
         if (lb <= ub) {

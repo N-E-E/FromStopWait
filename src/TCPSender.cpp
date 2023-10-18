@@ -15,7 +15,7 @@ void TCPSender::receive(const Packet& ackPacket) {
     if (Helpers::no_corrupt(ackPacket) && 
         Helpers::check_in_range(ackPacket.acknum, _base, (_base + _N) % _max_seqnum)) {  // TODO: here?
         
-        pUtils->printPacket("发送方正确收到确认", ackPacket);
+        logger->print_packet("发送方正确收到确认", ackPacket);
         
         // update info
         int latest_base = (ackPacket.acknum + 1) % _max_seqnum;
@@ -35,7 +35,7 @@ void TCPSender::receive(const Packet& ackPacket) {
         for (auto i = _base; i < upper_bound; i++) {
             int i_in_loop = i % _max_seqnum;
             std::string hint = "发送方没有正确收到确认，重发上次发送的报文-" + std::to_string(i_in_loop);
-            pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
+            logger->print_packet(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
             pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[i_in_loop]);
         }
 
@@ -53,7 +53,7 @@ void TCPSender::receive(const Packet& ackPacket) {
         
         if (_dup_ack_count == 3) {
             _dup_ack_count = 0;
-            pUtils->printPacket("发送方快速重传报文", *_packet_waiting_ack[_final_ack]);
+            logger->print_packet("发送方快速重传报文", *_packet_waiting_ack[_final_ack]);
             pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[_final_ack]);
 
             // (restart timer)stop and then start
@@ -61,4 +61,7 @@ void TCPSender::receive(const Packet& ackPacket) {
             pns->startTimer(SENDER, Configuration::TIME_OUT, _base);
         }
     }
+
+    logger->print_window(_base, _next_seqnum, "send-window");
+    return;
 }

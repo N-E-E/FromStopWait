@@ -12,6 +12,7 @@ GBNRdtSender::GBNRdtSender() :   _k(SEQNUM_BIT), _N(WINDOW_SIZE), _max_seqnum(MA
                                 _waiting_state(false), _base(0), _next_seqnum(0)
 {
     _packet_waiting_ack.resize(_max_seqnum);
+    logger->print_window(_base, _next_seqnum);
 }
 
 GBNRdtSender::GBNRdtSender(int k, int N) : _base(0), _next_seqnum(0), _waiting_state(false), 
@@ -25,7 +26,9 @@ GBNRdtSender::~GBNRdtSender() {}
 bool GBNRdtSender::send(const Message &message) {
     if (_waiting_state == true) {
         // window is full, refuse data
-        std::cout << "packet is blocking..." << std::endl;  
+        // std::cout << "packet is blocking..." << std::endl;
+        logger->common_info("packet is blocking...");
+        logger->print_window(_base, _next_seqnum);
         return false;
     }
 
@@ -37,7 +40,8 @@ bool GBNRdtSender::send(const Message &message) {
             int a = 1;
         }
 #endif
-        pUtils->printPacket("发送方发送报文", *_packet_waiting_ack[_next_seqnum]);
+        // pUtils->printPacket("发送方发送报文", *_packet_waiting_ack[_next_seqnum]);
+        logger->print_packet("发送方发送报文", *_packet_waiting_ack[_next_seqnum]);
         pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[_next_seqnum]);
         if (_base == _next_seqnum) {
             pns->startTimer(SENDER, Configuration::TIME_OUT, _base);
@@ -51,6 +55,7 @@ bool GBNRdtSender::send(const Message &message) {
         } else {
             _waiting_state = true;
         }
+        logger->print_window(_base, _next_seqnum);
         return true;
     }
     // abnormal case
@@ -68,7 +73,8 @@ void GBNRdtSender::receive(const Packet& ackPacket) {
     if (Helpers::no_corrupt(ackPacket) && 
         Helpers::check_in_range(ackPacket.acknum, _base, (_base + _N) % _max_seqnum)) {  // TODO: here?
         
-        pUtils->printPacket("发送方正确收到确认", ackPacket);
+        // pUtils->printPacket("发送方正确收到确认", ackPacket);
+        logger->print_packet("发送方正确收到确认", ackPacket);
         
         // update info
         int latest_base = (ackPacket.acknum + 1) % _max_seqnum;
@@ -87,7 +93,8 @@ void GBNRdtSender::receive(const Packet& ackPacket) {
         for (auto i = _base; i < upper_bound; i++) {
             int i_in_loop = i % _max_seqnum;
             std::string hint = "发送方没有正确收到确认，重发上次发送的报文-" + std::to_string(i_in_loop);
-            pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
+            // pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
+            logger->print_packet(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
             pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[i_in_loop]);
         }
 
@@ -98,6 +105,9 @@ void GBNRdtSender::receive(const Packet& ackPacket) {
     } else {  // ackPacket.acknum < _base
         // do nothing and waiting for resend.
     }
+
+    logger->print_window(_base, _next_seqnum);
+    return;
 }
 
 void GBNRdtSender::timeoutHandler(int seqNum) {
@@ -106,7 +116,8 @@ void GBNRdtSender::timeoutHandler(int seqNum) {
     for (auto i = _base; i < upper_bound; i++) {
         int i_in_loop = i % _max_seqnum;
         std::string hint = "发送方定时器时间到，重发上次发送的报文-" + std::to_string(i_in_loop);
-        pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
+        // pUtils->printPacket(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
+        logger->print_packet(hint.c_str(), *_packet_waiting_ack[i_in_loop]);
         pns->sendToNetworkLayer(RECEIVER, *_packet_waiting_ack[i_in_loop]);
     }
     // restart timer

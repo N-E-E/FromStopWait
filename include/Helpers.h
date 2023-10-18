@@ -3,8 +3,18 @@
 
 #include "DataStructure.h"
 #include <memory>
+#include <string>
 
 namespace Helpers {
+
+    class Logger {
+    public:
+        void print_packet(std::string description, const Packet& packet);
+
+        void common_info(std::string info);
+
+        void print_window(int start, int end, std::string hint = "slide-window");
+    };
 
     bool check_in_window(int target, int base);
     bool check_in_range(int target, int lb, int ub);
