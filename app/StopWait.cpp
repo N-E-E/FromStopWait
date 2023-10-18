@@ -11,7 +11,6 @@
 
 int main(int argc, char* argv[])
 {
-	srand(40);  // for debug
 	RdtSender *ps = new StopWaitRdtSender();
 	RdtReceiver * pr = new StopWaitRdtReceiver();
 	pns->setRunMode(0);  //VERBOS模式
@@ -19,8 +18,8 @@ int main(int argc, char* argv[])
 	pns->init();
 	pns->setRtdSender(ps);
 	pns->setRtdReceiver(pr);
-	pns->setInputFile("../input_.txt");
-	pns->setOutputFile("../output.txt");
+	pns->setInputFile("./input_.txt");
+	pns->setOutputFile("./output.txt");
 
 	pns->start();
 
